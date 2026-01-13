@@ -17,7 +17,7 @@
     <h2>Login</h2>
     <form action="../auth/login.php" method="post">
         <input
-            type="text"
+            type="email"
             name="username"
             placeholder="Username"
             required
@@ -43,3 +43,4 @@
 </div>
 </body>
 </html>
+
