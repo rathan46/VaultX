@@ -83,21 +83,79 @@ $folderTree = getFolders($pdo, $_SESSION['user_id']);
 <link rel="stylesheet" href="style.css">
 
 <style>
-body{display:flex;height:100vh;background:#020617}
-.sidebar{width:260px;padding:20px;border-right:1px solid rgba(255,255,255,.08);overflow-y:auto}
+body{
+    display:flex;
+    height:100vh;
+    background:#020617;
+    margin:0;
+    overflow:hidden; /* Prevent body scrolling */
+}
+.sidebar{
+    width:260px;
+    padding:20px;
+    border-right:1px solid rgba(255,255,255,.08);
+    overflow-y:auto;
+    position:fixed; /* Changed from sticky to fixed */
+    top:0;
+    left:0;
+    height:100vh; /* Full viewport height */
+    flex-shrink:0; /* Prevent sidebar from shrinking */
+}
 .sidebar h2{color:#38bdf8;margin-bottom:20px}
-.sidebar a{display:block;padding:10px;border-radius:10px;color:#e5e7eb;margin-bottom:6px;cursor:pointer}
-.sidebar a.active,.sidebar a:hover{background:rgba(56,189,248,.15);color:#38bdf8}
+.sidebar a{
+    display:block;
+    padding:10px;
+    border-radius:10px;
+    color:#e5e7eb;
+    margin-bottom:6px;
+    cursor:pointer;
+    text-decoration:none;
+}
+.sidebar a.active,.sidebar a:hover{
+    background:rgba(56,189,248,.15);
+    color:#38bdf8;
+}
 
 .folder-tree ul{list-style:none;padding-left:15px}
 .folder-tree li span{display:block;padding:6px;border-radius:6px;cursor:pointer}
 .folder-tree li span:hover{background:rgba(56,189,248,.15)}
 
-.main{flex:1;display:flex;flex-direction:column}
-.topbar{height:64px;padding:0 25px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.08)}
-.content{padding:25px;overflow-y:auto}
+.main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    margin-left:260px; /* Account for fixed sidebar width */
+    width:calc(100vw - 260px); /* Calculate remaining width */
+    overflow:hidden; /* Prevent main from causing scroll */
+    height:100vh; /* Make main container full height */
+}
+.topbar{
+    height:64px;
+    padding:0 25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:#020617; /* Match background color */
+    flex-shrink:0; /* Prevent topbar from shrinking */
+}
+.content{
+    padding:25px;
+    overflow-y:auto; /* Only content area scrolls */
+    flex:1;
+    max-height:calc(100vh - 64px); /* Viewport minus topbar */
+}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
+/* Rest of your CSS remains the same */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:20px;
+    min-height:0; /* Important for grid to respect container height */
+}
 .file-card{background:rgba(255,255,255,.05);border-radius:14px;padding:18px}
 .file-name{margin:10px 0;font-weight:500;word-break:break-word}
 .file-actions{display:flex;gap:8px;flex-wrap:wrap}
@@ -109,11 +167,25 @@ body{display:flex;height:100vh;background:#020617}
 .suggestions div:hover{background:rgba(56,189,248,.2)}
 details summary{cursor:pointer;color:#38bdf8;margin-top:8px}
 
-.page{display:none}
-.page.active{display:block}
+.page{
+    display:none;
+    height:100%; /* Make pages take full height */
+    overflow-y:auto; /* Let each page scroll if needed */
+}
+.page.active{
+    display:block;
+    height:100%;
+    overflow-y:visible;
+}
 
 .new-item{padding:10px 14px;cursor:pointer}
 .new-item:hover{background:rgba(56,189,248,.15)}
+
+/* Specific styling for upload form */
+#uploadForm {
+    flex-shrink: 0; /* Prevent upload form from shrinking */
+}
+
 </style>
 </head>
 
