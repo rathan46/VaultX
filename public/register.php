@@ -17,11 +17,11 @@
     <h2>Register</h2>
     <form action="../auth/register.php" method="post">
         <input
-            type="text"
+            type="email"
             name="username"
-            placeholder="Choose Username"
+            placeholder="E-mail"
             required
-            autocomplete="username"
+            autocomplete="email"
         >
 
         <input
