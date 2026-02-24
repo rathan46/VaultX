@@ -19,9 +19,9 @@
         <input
             type="email"
             name="username"
-            placeholder="Username"
+            placeholder="E-Mail"
             required
-            autocomplete="username"
+            autocomplete="email"
         >
 
         <input
