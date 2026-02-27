@@ -1,0 +1,37 @@
+{
+    "name": "vaultx/vaultx",
+    "description": "Secure file storage with OTP authentication",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "VaultX Team",
+            "email": "info@vaultx.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "phpmailer/phpmailer": "^6.8"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "VaultX\\": "src/"
+        },
+        "classmap": [
+            "utils/"
+        ]
+    },
+    "scripts": {
+        "test": "phpunit",
+        "setup": "php test_otp_setup.php"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "composer/installers": true
+        }
+    }
+}

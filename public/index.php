@@ -35,6 +35,7 @@
         <button type="submit">Login</button>
     </form>
     <p style="color:white;">New user?<a href="register.php">register here</a></p>
+    <p style="color:white;"><a href="forgot_password.php">Forgot password?</a></p>
 
     <!--<hr style="margin:20px 0; border:0; height:1px; background:rgba(255,255,255,0.1);">-->
 

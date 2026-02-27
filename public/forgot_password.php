@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - VaultX</title>
+    <title>Forgot Password - VaultX</title>
     <style>
         * {
             margin: 0;
@@ -213,60 +213,70 @@
 
         <div id="alert" class="alert"></div>
 
-        <!-- Step 1: Initial Registration -->
-        <div id="step-register" class="form-section active">
-            <h2 style="text-align: center; margin-bottom: 30px; color: #333;">Create Account</h2>
-            <form id="registerForm">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required placeholder="Choose a username">
-                </div>
+        <!-- Step 1: Email Request -->
+        <div id="step-email" class="form-section active">
+            <h2 style="text-align: center; margin-bottom: 10px; color: #333;">Reset Password</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px; font-size: 14px;">
+                Enter your email to receive a password reset code
+            </p>
 
+            <form id="emailForm">
                 <div class="form-group">
                     <label for="email">Email Address</label>
                     <input type="email" id="email" name="email" required placeholder="your@email.com">
                 </div>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required placeholder="At least 8 characters">
-                </div>
-
-                <div class="form-group">
-                    <label for="confirm_password">Confirm Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm your password">
-                </div>
-
-                <button type="submit">Send OTP to Email</button>
+                <button type="submit">Send Reset Code</button>
 
                 <div class="footer-text">
-                    Already have an account? <a href="index.php">Login here</a>
+                    Remember your password? <a href="index.php">Login here</a>
                 </div>
             </form>
         </div>
 
         <!-- Step 2: OTP Verification -->
-        <div id="step-verify" class="form-section">
-            <h2 style="text-align: center; margin-bottom: 10px; color: #333;">Verify Email</h2>
+        <div id="step-otp" class="form-section">
+            <h2 style="text-align: center; margin-bottom: 10px; color: #333;">Verify Code</h2>
             <p style="text-align: center; color: #666; margin-bottom: 30px; font-size: 14px;">
                 Enter the 6-digit code sent to your email
             </p>
 
-            <form id="verifyForm">
+            <form id="otpForm">
                 <div class="form-group">
                     <label for="otp">One-Time Password</label>
                     <input type="number" id="otp" name="otp" class="otp-input" required placeholder="000000" min="0" max="999999">
                 </div>
 
-                <button type="submit">Verify OTP</button>
+                <button type="submit">Verify Code</button>
 
                 <div class="timer">
-                    <span id="timerText">OTP expires in <span id="timerValue">10:00</span></span>
+                    <span id="timerText">Code expires in <span id="timerValue">10:00</span></span>
                 </div>
 
                 <div class="resend-otp">
-                    <a id="resendBtn" onclick="resendOTP()">Resend OTP</a>
+                    <a id="resendBtn" onclick="resendOTP()">Resend Code</a>
                 </div>
+
+                <button type="button" class="back-btn" onclick="goBack()">Back</button>
+            </form>
+        </div>
+
+        <!-- Step 3: New Password -->
+        <div id="step-password" class="form-section">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #333;">Create New Password</h2>
+
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" name="password" required placeholder="At least 8 characters">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirm_password" required placeholder="Confirm your password">
+                </div>
+
+                <button type="submit">Reset Password</button>
 
                 <button type="button" class="back-btn" onclick="goBack()">Back</button>
             </form>
@@ -284,6 +294,7 @@
         let resendDisabled = false;
         let timerInterval;
         let timerSeconds = 600; // 10 minutes in seconds
+        let previousStep = 'step-email';
 
         // Show alert message
         function showAlert(message, type = 'error') {
@@ -300,15 +311,15 @@
         // Toggle loading state
         function setLoading(isLoading) {
             document.getElementById('loading').style.display = isLoading ? 'block' : 'none';
-            if (!isLoading) {
-                document.querySelector('.form-section.active form').style.display = 'block';
-            } else {
-                document.querySelector('.form-section.active form').style.display = 'none';
+            const activeForm = document.querySelector('.form-section.active form');
+            if (activeForm) {
+                activeForm.style.display = isLoading ? 'none' : 'block';
             }
         }
 
         // Switch to step
         function switchStep(stepId) {
+            previousStep = document.querySelector('.form-section.active').id;
             document.querySelectorAll('.form-section').forEach(el => {
                 el.classList.remove('active');
             });
@@ -316,21 +327,18 @@
             hideAlert();
         }
 
-        // Register form submission
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        // Email form submission
+        document.getElementById('emailForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             hideAlert();
             setLoading(true);
 
             const formData = new FormData();
-            formData.append('action', 'request_otp');
-            formData.append('username', document.getElementById('username').value);
+            formData.append('action', 'request_reset');
             formData.append('email', document.getElementById('email').value);
-            formData.append('password', document.getElementById('password').value);
-            formData.append('confirm_password', document.getElementById('confirm_password').value);
 
             try {
-                const response = await fetch('../auth/register.php', {
+                const response = await fetch('../auth/forgot_password.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -340,7 +348,7 @@
 
                 if (data.success) {
                     showAlert(data.message, 'success');
-                    switchStep('step-verify');
+                    switchStep('step-otp');
                     startTimer();
                 } else {
                     showAlert(data.message, 'error');
@@ -351,8 +359,8 @@
             }
         });
 
-        // Verify OTP form submission
-        document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+        // OTP form submission
+        document.getElementById('otpForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             hideAlert();
             setLoading(true);
@@ -362,7 +370,7 @@
             formData.append('otp', document.getElementById('otp').value);
 
             try {
-                const response = await fetch('../auth/register.php', {
+                const response = await fetch('../auth/forgot_password.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -372,7 +380,39 @@
 
                 if (data.success) {
                     showAlert(data.message, 'success');
+                    switchStep('step-password');
                     clearInterval(timerInterval);
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                setLoading(false);
+                showAlert('An error occurred. Please try again.', 'error');
+            }
+        });
+
+        // Password reset form submission
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAlert();
+            setLoading(true);
+
+            const formData = new FormData();
+            formData.append('action', 'reset_password');
+            formData.append('password', document.getElementById('newPassword').value);
+            formData.append('confirm_password', document.getElementById('confirmPassword').value);
+
+            try {
+                const response = await fetch('../auth/forgot_password.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                setLoading(false);
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
                     setTimeout(() => {
                         window.location.href = data.redirect;
                     }, 2000);
@@ -388,7 +428,7 @@
         // Resend OTP
         async function resendOTP() {
             if (resendDisabled) {
-                showAlert('Please wait before requesting another OTP', 'error');
+                showAlert('Please wait before requesting another code', 'error');
                 return;
             }
 
@@ -399,7 +439,7 @@
             formData.append('action', 'resend_otp');
 
             try {
-                const response = await fetch('../auth/register.php', {
+                const response = await fetch('../auth/forgot_password.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -428,10 +468,16 @@
             }
         }
 
-        // Go back to register step
+        // Go back to previous step
         function goBack() {
-            switchStep('step-register');
-            clearInterval(timerInterval);
+            const activeStep = document.querySelector('.form-section.active').id;
+            if (activeStep === 'step-otp') {
+                switchStep('step-email');
+                clearInterval(timerInterval);
+            } else if (activeStep === 'step-password') {
+                switchStep('step-otp');
+                startTimer();
+            }
         }
 
         // Timer for OTP expiry
@@ -450,13 +496,13 @@
             
             if (timerSeconds <= 0) {
                 clearInterval(timerInterval);
-                showAlert('OTP has expired. Please request a new one.', 'error');
+                showAlert('Code has expired. Please request a new one.', 'error');
             }
 
             timerSeconds--;
         }
 
-        // Auto-focus next input on OTP field
+        // Auto-limit OTP field
         document.getElementById('otp').addEventListener('input', (e) => {
             if (e.target.value.length > 6) {
                 e.target.value = e.target.value.slice(0, 6);
