@@ -10,6 +10,17 @@ $response = ['success' => false, 'message' => '', 'step' => 'initial'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
+    // Try to create OTP manager, if it fails, show clear error
+    $otpManager = null;
+    try {
+        $otpManager = new OTPManager($pdo);
+    } catch (Exception $e) {
+        $response['message'] = 'System Error: PHP Mailer files missing. Download from https://github.com/PHPMailer/PHPMailer and extract to /vendor/PHPMailer/src/';
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
+    }
+
     if ($action === 'request_otp') {
         // Step 1: User submits email and password, OTP is sent
         $username = trim($_POST['username'] ?? '');
@@ -36,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $response['message'] = 'Username or email already exists';
                 } else {
                     // Create OTP
-                    $otpManager = new OTPManager($pdo);
                     $otp = $otpManager->createOTP($email, 'registration');
 
                     if ($otp && $otpManager->sendOTPEmail($email, $otp, 'registration')) {
@@ -118,7 +128,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             try {
                 $email = $_SESSION['temp_register']['email'];
-                $otpManager = new OTPManager($pdo);
                 $otp = $otpManager->createOTP($email, 'registration');
 
                 if ($otp && $otpManager->sendOTPEmail($email, $otp, 'registration')) {
