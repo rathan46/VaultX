@@ -1,6 +1,10 @@
 <?php
 require_once __DIR__ . '/../config/email.php';
-require_once __DIR__ . '/../vendor/autoload.php';
+
+// Load PHPMailer classes manually (for manual installation without Composer)
+require_once __DIR__ . '/../vendor/PHPMailer/src/PHPMailer.php';
+require_once __DIR__ . '/../vendor/PHPMailer/src/Exception.php';
+require_once __DIR__ . '/../vendor/PHPMailer/src/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
